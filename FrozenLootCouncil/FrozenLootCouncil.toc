@@ -1,0 +1,10 @@
+## Interface: 11303
+## Title: Frozen Loot Council
+## Notes: A tool to determine who shall sit on the loot council for the current raid
+## Version: 1.0
+## DefaultState: enabled
+## Author: Neffer-Razorgore
+
+embeds.xml
+
+FrozenLootCouncil.lua
