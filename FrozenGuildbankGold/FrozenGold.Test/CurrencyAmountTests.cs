@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using FluentAssertions;
 using Xunit;
 
@@ -116,57 +117,147 @@ namespace FrozenGold.tests
         }
 
         [Fact]
-        public void IEquatable()
+        public void Equals_WhenCurrencyAmountsAreSame_ReturnsTrue()
         {
-            Assert.True(false, "Todo");
+            uint totalcopper = 8923045;
+
+            var first = CurrencyAmount.FromCopper(totalcopper);
+            var second = CurrencyAmount.FromCopper(totalcopper);
+
+            first.Equals(second).Should().BeTrue();
         }
 
         [Fact]
-        public void HashCode()
+        public void Equals_whenCurrencyAmountsDiffer_ReturnsFalse()
         {
-            Assert.True(false, "Todo");
+            uint firstCopper = 8923045;
+            uint secondCopper = 89589564;
+
+            var first = CurrencyAmount.FromCopper(firstCopper);
+            var second = CurrencyAmount.FromCopper(secondCopper);
+
+            first.Equals(second).Should().BeFalse();
+        }
+
+        [Fact]
+        public void HashCode_SameForEquivalentObjects()
+        {
+            uint totalcopper = 8923045;
+
+            var first = CurrencyAmount.FromCopper(totalcopper);
+            var second = CurrencyAmount.FromCopper(totalcopper);
+
+            first.GetHashCode().Should().Be(second.GetHashCode());
+        }
+
+        [Fact]
+        public void HashCode_DifferentForDifferentQuantities()
+        {
+            uint firstCopper = 8923045;
+            uint secondCopper = 89589564;
+
+            var first = CurrencyAmount.FromCopper(firstCopper);
+            var second = CurrencyAmount.FromCopper(secondCopper);
+
+            first.GetHashCode().Should().NotBe(second.GetHashCode());
         }
         
         [Fact]
-        public void OperatorAdd()
+        public void OperatorEquals_WhenQuantitiesMatch_IsTrue()
         {
-            Assert.True(false, "Todo");
+            uint totalcopper = 8923045;
+
+            var first = CurrencyAmount.FromCopper(totalcopper);
+            var second = CurrencyAmount.FromCopper(totalcopper);
+
+            (first == second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorEquals_WhenQuantitiesDoNotMatch_IsFalse()
+        {
+            uint firstCopper = 8923045;
+            uint secondCopper = 89589564;
+
+            var first = CurrencyAmount.FromCopper(firstCopper);
+            var second = CurrencyAmount.FromCopper(secondCopper);
+            
+            (first == second).Should().BeFalse();
         }
 
         [Fact]
-        public void OperatorSubtract()
+        public void OperatorNotEqual_WhenQuantitiesMatch_IsFalse()
         {
-            Assert.True(false, "Todo");
+            uint totalcopper = 8923045;
+
+            var first = CurrencyAmount.FromCopper(totalcopper);
+            var second = CurrencyAmount.FromCopper(totalcopper);
+            
+            (first != second).Should().BeFalse();
+        }
+
+        [Fact]
+        public void OperatorNotEqual_WhenQuantitiesDoNotMatch_IsTrue()
+        {
+            uint firstCopper = 8923045;
+            uint secondCopper = 89589564;
+
+            var first = CurrencyAmount.FromCopper(firstCopper);
+            var second = CurrencyAmount.FromCopper(secondCopper);
+            
+            (first != second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorAdd_WithTwoAmounts_ReturnsNewAmountWithCorrectValue()
+        {
+            var first = new CurrencyAmount(1, 2, 3);
+            var second = new CurrencyAmount(4,9,6);
+            
+            var expected = new CurrencyAmount(5, 11, 9);
+
+            (first + second).Should().Be(expected);
+        }
+
+        [Fact]
+        public void OperatorSubtract_WithTwoAmounts_ReturnsNewAmountWithCorrectValue()
+        {
+            var first = new CurrencyAmount(1, 2, 3);
+            var second = new CurrencyAmount(4,9,6);
+            
+            var expected = new CurrencyAmount(3, 7, 3);
+
+            (second - first).Should().Be(expected);
+        }
+
+        [Fact]
+        public void OperatorMultiply_WithIntegerMultiplier_ReturnsNewAmountWithCorrectValue()
+        {
+            var amount = new CurrencyAmount(1, 2, 3);
+            int mult = 3;
+            
+            var expected = new CurrencyAmount(3, 6, 9);
+
+            (amount * 3).Should().Be(expected);
+        }
+        
+        [Fact]
+        public void OperatorMultiply_WithIntegerMultiplier_IsCommutative()
+        {
+            var amount = new CurrencyAmount(1, 2, 3);
+            int mult = 3;
+            
+            var expected = new CurrencyAmount(3, 6, 9);
+
+            (3 * amount).Should().Be(expected);
         }
 
         [Fact]
         public void ToString_WhenCalled_ShouldOutputReadableFormat()
         {
-            Assert.True(false, "Todo");
-        }
+            var sut = new CurrencyAmount(4, 3, 2);
 
-        [Fact]
-        public void OperatorMult()
-        {
-            Assert.True(false, "Todo");
-        }
-
-        [Fact]
-        public void OperatorDiv()
-        {
-            Assert.True(false, "Todo");
-        }
-
-        [Fact]
-        public void OperatorEquals()
-        {
-            Assert.True(false, "Todo");
-        }
-
-        [Fact]
-        public void OperatorNotEqual()
-        {
-            Assert.True(false, "Todo");
+            sut.ToString().Should().Be("4g 3s 2c");
         }
     }
 }

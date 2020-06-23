@@ -65,11 +65,11 @@ namespace FrozenGold
             return HashCode.Combine(Gold, Silver, Copper);
         }
         
-        public static CurrencyAmount operator *(CurrencyAmount amount, decimal multiplier)
+        public static CurrencyAmount operator *(CurrencyAmount amount, int multiplier)
             => FromCopper((uint) (amount.TotalCopper * multiplier));
-
-        public static CurrencyAmount operator /(CurrencyAmount amount, decimal denominator)
-            => FromCopper((uint) (amount.TotalCopper / denominator));
+        
+        public static CurrencyAmount operator *(int multiplier, CurrencyAmount amount)
+            => FromCopper((uint) (amount.TotalCopper * multiplier));
 
         public static CurrencyAmount operator +(CurrencyAmount a, CurrencyAmount b)
             => FromCopper(a.TotalCopper + b.TotalCopper);
