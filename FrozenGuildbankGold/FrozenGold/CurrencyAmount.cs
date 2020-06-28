@@ -35,6 +35,8 @@ namespace FrozenGold
 
         public uint TotalCopper => Copper + 100 * Silver + 10000 * Gold;
 
+        public static CurrencyAmount Zero => new CurrencyAmount(0,0,0);
+
         public static CurrencyAmount FromCopper(uint copper)
         {
             return new CurrencyAmount(0, 0, copper);
