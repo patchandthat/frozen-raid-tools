@@ -6,7 +6,7 @@ namespace FrozenGold
     public class Tariff
     {
         public TariffItem CurrentRate => History.LastOrDefault();
-        public TariffItem[] History { get; protected set; }
+        public TariffItem[] History { get; set; }
     }
 
     public class TariffItem

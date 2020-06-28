@@ -37,6 +37,16 @@ namespace FrozenGold
 
         public static CurrencyAmount Zero => new CurrencyAmount(0,0,0);
 
+        public static CurrencyAmount FromGold(uint gold)
+        {
+            return new CurrencyAmount(gold, 0, 0);
+        }
+        
+        public static CurrencyAmount FromSilver(uint silver)
+        {
+            return new CurrencyAmount(0, silver, 0);
+        }
+        
         public static CurrencyAmount FromCopper(uint copper)
         {
             return new CurrencyAmount(0, 0, copper);

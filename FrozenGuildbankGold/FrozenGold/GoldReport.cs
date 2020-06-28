@@ -6,10 +6,10 @@ namespace FrozenGold
 {
     public class GoldReport
     {
+        private readonly IDataSource _dataSource;
         public const string Taxman = "FrozenGold";
         public const string Banker = "Frozbank";
 
-        private readonly DateTimeOffset _lastUpdated;
         private readonly Roster _roster;
         private readonly Tariff _tariff;
         private readonly IReadOnlyList<Transaction> _transactions;
@@ -17,12 +17,16 @@ namespace FrozenGold
 
         public GoldReport(IDataSource dataSource)
         {
-            if (dataSource == null) throw new ArgumentNullException(nameof(dataSource));
-            
+            _dataSource = dataSource ?? throw new ArgumentNullException(nameof(dataSource));
+
             _roster = dataSource.GetRoster();
             _tariff = dataSource.GetTariff();
             _transactions = dataSource.GetTransactionHistory();
-            _lastUpdated = dataSource.GetLastUpdatedDate();
+            LastUpdated = dataSource.GetLastUpdatedDate();
+            
+            Received = CurrencyAmount.Zero;
+            SentToBanker = CurrencyAmount.Zero;
+            PlayerReports = Enumerable.Empty<PlayerReport>();
         }
         
         public CurrencyAmount Received { get; private set; }
@@ -38,31 +42,26 @@ namespace FrozenGold
         public IEnumerable<Transaction> UnprocessedTransactions => _badTransactions;
         
         public IEnumerable<PlayerReport> PlayerReports { get; private set; }
-        
+        public DateTimeOffset LastUpdated { get; }
+
         public class PlayerReport
         {
             public PlayerReport(Player player)
             {
                 Player = player;
+                
+                AmountPaid = CurrencyAmount.Zero;
+                AmountDueToDate = CurrencyAmount.Zero;
             }
 
             public Player Player { get; private set; }
             public CurrencyAmount AmountPaid { get; set; }
             public CurrencyAmount AmountDueToDate { get; set; }
-            public PaymentStatus Status { get; }
-
-            /// <summary>
-            /// If a player is behind or ahead on payments, this is how much gold in credit/owed
-            /// </summary>
-            public CurrencyAmount StatusAmount { get; }
-        
-            /// <summary>
-            /// If a player is behind or ahead on payments, the date they are behind since/paid until
-            /// </summary>
-            public DateTimeOffset? StatusDate { get; }
+            
+            // Todo: Get Summary
         }
         
-        public void GenerateReport()
+        public void BuildReport()
         {
             _badTransactions = new List<Transaction>();
             Received = CurrencyAmount.Zero;
@@ -71,7 +70,7 @@ namespace FrozenGold
             var playerReports = new Dictionary<Player, PlayerReport>();
 
             CalculateDues(playerReports);
-            ProcessTransactions(playerReports);
+            // ProcessTransactions(playerReports);
 
             PlayerReports = playerReports
                 .Select(kvp => kvp.Value)
@@ -80,7 +79,37 @@ namespace FrozenGold
 
         private void CalculateDues(Dictionary<Player, PlayerReport> playerReports)
         {
-            
+            foreach (Player player in _roster.Players)
+            {
+                playerReports[player] = new PlayerReport(player);
+
+                int tariffIndex = 0;
+                TariffItem currentRate = _tariff.History[tariffIndex];
+                var currentDate = currentRate.BeginsOn;
+
+                while (currentDate < _dataSource.NowServerTime)
+                {
+                    if (currentRate != _tariff.CurrentRate)
+                    {
+                        var nextRate = _tariff.History[tariffIndex + 1];
+                        if (nextRate.BeginsOn <= currentDate)
+                        {
+                            currentRate = nextRate;
+                            tariffIndex++;
+                        }
+                    }
+                    
+                    var intervalEndDate = currentDate + currentRate.RepeatInterval;
+                    
+                    if (player.IsRetired && player.RetiredOn < intervalEndDate)
+                        break;
+                    
+                    if (player.JoinedOn < intervalEndDate)
+                        playerReports[player].AmountDueToDate += currentRate.Amount;
+
+                    currentDate = intervalEndDate;
+                }
+            }
         }
 
         private void ProcessTransactions(Dictionary<Player, PlayerReport> playerReports)

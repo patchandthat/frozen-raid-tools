@@ -9,5 +9,7 @@ namespace FrozenGold
         public Tariff GetTariff();
         public IReadOnlyList<Transaction> GetTransactionHistory();
         public DateTimeOffset GetLastUpdatedDate();
+        
+        DateTimeOffset NowServerTime { get; }
     }
 }

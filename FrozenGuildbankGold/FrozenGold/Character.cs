@@ -8,5 +8,7 @@ namespace FrozenGold
         }
 
         public string Name { get; }
+        
+        public CharacterClass Class { get; set; }
     }
 }
