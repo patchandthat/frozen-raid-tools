@@ -11,13 +11,16 @@
 
     <ItemGroup>
       <None Remove="Accounting_Razorgore_income.csv" />
-      <Content Include="Accounting_Razorgore_income.csv">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\FrozenGold\FrozenGold.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\Accounting_Razorgore_income.csv">
+        <Link>Accounting_Razorgore_income.csv</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

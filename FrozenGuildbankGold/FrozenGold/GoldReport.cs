@@ -26,8 +26,8 @@ namespace FrozenGold
         }
         
         public CurrencyAmount Received { get; private set; }
-        public CurrencyAmount SentToFrozbank { get; private set; }
-        public CurrencyAmount GoldOnHand => Received - SentToFrozbank;
+        public CurrencyAmount SentToBanker { get; private set; }
+        public CurrencyAmount GoldOnHand => Received - SentToBanker;
 
         public IEnumerable<Transaction> AllTransactions => _transactions;
 
@@ -66,7 +66,7 @@ namespace FrozenGold
         {
             _badTransactions = new List<Transaction>();
             Received = CurrencyAmount.Zero;
-            SentToFrozbank = CurrencyAmount.Zero;
+            SentToBanker = CurrencyAmount.Zero;
             
             var playerReports = new Dictionary<Player, PlayerReport>();
 
@@ -108,7 +108,7 @@ namespace FrozenGold
                 }
                 else if (tx.PlayerFrom == Taxman && tx.PlayerTo == Banker)
                 {
-                    SentToFrozbank += tx.Amount;
+                    SentToBanker += tx.Amount;
                 }
                 else
                 {

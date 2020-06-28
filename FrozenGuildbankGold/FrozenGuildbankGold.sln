@@ -6,6 +6,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Test", "FrozenGo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Console", "FrozenGold.Console\FrozenGold.Console.csproj", "{2F182B2A-7B70-4C81-B494-69AAADE3BE4E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccountingData", "AccountingData", "{860C6637-A97F-4705-91C2-E2CD71A38F33}"
+ProjectSection(SolutionItems) = preProject
+	Accounting_Razorgore_income.csv = Accounting_Razorgore_income.csv
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
