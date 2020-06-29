@@ -1,18 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold", "FrozenGold\FrozenGold.csproj", "{E922B108-6CDF-4FB6-88CC-3192BA5412A9}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold", "FrozenGold\FrozenGold.csproj", "{E922B108-6CDF-4FB6-88CC-3192BA5412A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Test", "FrozenGold.Test\FrozenGold.Test.csproj", "{F8A7D30A-FC0A-44B0-99D2-535F03F544F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold.Test", "FrozenGold.Test\FrozenGold.Test.csproj", "{F8A7D30A-FC0A-44B0-99D2-535F03F544F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Console", "FrozenGold.Console\FrozenGold.Console.csproj", "{2F182B2A-7B70-4C81-B494-69AAADE3BE4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold.Console", "FrozenGold.Console\FrozenGold.Console.csproj", "{2F182B2A-7B70-4C81-B494-69AAADE3BE4E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccountingData", "AccountingData", "{860C6637-A97F-4705-91C2-E2CD71A38F33}"
-ProjectSection(SolutionItems) = preProject
-	Accounting_Razorgore_income.csv = Accounting_Razorgore_income.csv
-	Accounting_Razorgore_expenses.csv = Accounting_Razorgore_expenses.csv
-EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold.Web", "FrozenGold.Web\FrozenGold.Web.csproj", "{6CB5B026-1CDC-4AA9-9376-AD39AE515513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Web", "FrozenGold.Web\FrozenGold.Web.csproj", "{6CB5B026-1CDC-4AA9-9376-AD39AE515513}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Api", "FrozenGold.Api\FrozenGold.Api.csproj", "{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +35,15 @@ Global
 		{6CB5B026-1CDC-4AA9-9376-AD39AE515513}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CB5B026-1CDC-4AA9-9376-AD39AE515513}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CB5B026-1CDC-4AA9-9376-AD39AE515513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DED3E293-8BDD-418A-A59B-798567FD360A}
 	EndGlobalSection
 EndGlobal
