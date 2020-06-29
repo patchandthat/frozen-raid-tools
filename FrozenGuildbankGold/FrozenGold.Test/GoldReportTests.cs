@@ -745,5 +745,99 @@ namespace FrozenGold.tests
             sut.OddTransactions.Count().Should().Be(1);
             sut.OddTransactions.Should().Contain(oddTransaction);
         }
+
+        [Fact]
+        public void ctor_WhenCalled_RefundsIsEmpty()
+        {
+            var sut = CreateSut();
+
+            sut.Refunds.Should().BeEmpty();
+        }
+        
+        [Fact]
+        public void BuildReport_RefundsToPlayersWhoHaveLeft_ShouldNotBeOddTransactions()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(7);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"))
+                .Add(new Player("Gicanu")
+                {
+                    // Left during week 2
+                    LeftOn = firstRateStart.AddDays(9)
+                });
+
+            var refundTxn = new Transaction( 
+                TransactionType.MoneyTransfer,
+                CurrencyAmount.FromGold(40), 
+                "Frozengold",
+                "Gicanu",
+                firstRateStart.AddDays(10));
+            
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                // Income week 1
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddHours(12)),
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Gicanu",
+                    "Frozengold",
+                    firstRateStart.AddHours(12)), 
+                // Income week 2
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddDays(8)),
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Gicanu",
+                    "Frozengold",
+                    firstRateStart.AddDays(8)),
+                // Refund
+                refundTxn,
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+
+            sut.Received.Should().Be(CurrencyAmount.FromGold(160));
+            sut.Refunded.Should().Be(CurrencyAmount.FromGold(40));
+            sut.GoldOnHand.Should().Be(CurrencyAmount.FromGold(120));
+            sut.OddTransactions.Should().BeEmpty();
+            sut.Refunds.Count().Should().Be(1);
+            sut.Refunds.Should().Contain(refundTxn);
+            
+            var gicanu = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Gicanu");
+            gicanu.AmountPaid.Should().Be(CurrencyAmount.FromGold(40));
+            gicanu.AmountDueToDate.Should().Be(CurrencyAmount.FromGold(40));
+        }
     }
 }

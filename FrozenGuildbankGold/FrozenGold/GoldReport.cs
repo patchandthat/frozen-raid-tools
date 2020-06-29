@@ -15,6 +15,7 @@ namespace FrozenGold
         private readonly Tariff _tariff;
         private readonly IReadOnlyList<Transaction> _transactions;
         private readonly List<Transaction> _oddTransactions;
+        private readonly List<Transaction> _refunds;
 
         public GoldReport(IDataSource dataSource)
         {
@@ -26,16 +27,19 @@ namespace FrozenGold
             LastUpdated = dataSource.GetLastUpdatedDate();
             
             Received = CurrencyAmount.Zero;
+            Refunded = CurrencyAmount.Zero;
             SentToBanker = CurrencyAmount.Zero;
             MailboxFees = CurrencyAmount.Zero;
             PlayerReports = Enumerable.Empty<PlayerReport>();
             _oddTransactions = new List<Transaction>();
+            _refunds = new List<Transaction>();
         }
 
         public CurrencyAmount Received { get; private set; }
         public CurrencyAmount SentToBanker { get; private set; }
         public CurrencyAmount MailboxFees { get; private set; }
-        public CurrencyAmount GoldOnHand => Received - (SentToBanker + MailboxFees);
+        public CurrencyAmount Refunded { get; private set; }
+        public CurrencyAmount GoldOnHand => Received - (SentToBanker + MailboxFees + Refunded);
 
         public IEnumerable<Transaction> AllTransactions => _transactions;
 
@@ -44,15 +48,13 @@ namespace FrozenGold
         /// The roster probably needs updating for those foreign types with accents in their names.
         /// </summary>
         public IEnumerable<Transaction> OddTransactions => _oddTransactions;
+        public IEnumerable<Transaction> Refunds => _refunds;
         public IEnumerable<PlayerReport> PlayerReports { get; private set; }
         public DateTimeOffset LastUpdated { get; }
 
         public void BuildReport()
         {
-            _oddTransactions.Clear();
-            Received = CurrencyAmount.Zero;
-            SentToBanker = CurrencyAmount.Zero;
-            MailboxFees = CurrencyAmount.Zero;
+            Reset();
 
             var playerReports = new Dictionary<Player, PlayerReport>();
 
@@ -63,7 +65,17 @@ namespace FrozenGold
                 .Select(kvp => kvp.Value)
                 .ToList();
         }
-        
+
+        private void Reset()
+        {
+            _oddTransactions.Clear();
+            _refunds.Clear();
+            Received = CurrencyAmount.Zero;
+            Refunded = CurrencyAmount.Zero;
+            SentToBanker = CurrencyAmount.Zero;
+            MailboxFees = CurrencyAmount.Zero;
+        }
+
         private void CalculateDues(Dictionary<Player, PlayerReport> playerReports)
         {
             foreach (Player player in _roster.Players)
@@ -103,7 +115,7 @@ namespace FrozenGold
         {
             foreach (var tx in _transactions)
             {
-                if (tx.PlayerTo == Taxman)
+                if (tx.PlayerTo.Equals(Taxman, StringComparison.CurrentCultureIgnoreCase))
                 {
                     Received += tx.Amount;
                     
@@ -117,10 +129,29 @@ namespace FrozenGold
                     var report = playerReports[player];
                     report.AmountPaid += tx.Amount;
                 }
-                else if (tx.PlayerTo == Banker && tx.PlayerFrom == Taxman)
+                else if (tx.PlayerTo.Equals(Banker, StringComparison.CurrentCultureIgnoreCase) && 
+                         tx.PlayerFrom.Equals(Taxman, StringComparison.CurrentCultureIgnoreCase))
                 {
                     SentToBanker += tx.Amount;
                     MailboxFees += CurrencyAmount.FromCopper(30);
+                }
+                else if (tx.PlayerFrom.Equals(Taxman, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var player = _roster.Find(tx.PlayerTo);
+                    if (player == null)
+                    {
+                        _oddTransactions.Add(tx);
+                        continue;
+                    }
+
+                    // Account for refunds where the player left the raid team
+                    if (player.IsRetired)
+                    {
+                        var report = playerReports[player];
+                        report.AmountPaid -= tx.Amount;
+                        Refunded += tx.Amount;
+                        _refunds.Add(tx);
+                    }
                 }
                 else
                 {

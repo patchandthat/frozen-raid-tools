@@ -20,13 +20,23 @@ namespace FrozenGold.Console
         [Name("time")]
         public long Time { get; set; }
 
-        public Transaction ToTransaction()
+        public Transaction ToIncomeTransaction()
         {
             return new Transaction(
                 Type == "Money Transfer" ? TransactionType.MoneyTransfer : TransactionType.Other,
                 CurrencyAmount.FromCopper(Amount), 
                 OtherPlayer,
                 Player,
+                DateTimeOffset.FromUnixTimeSeconds(Time));
+        }
+        
+        public Transaction ToExpenseTransaction()
+        {
+            return new Transaction(
+                Type == "Money Transfer" ? TransactionType.MoneyTransfer : TransactionType.Other,
+                CurrencyAmount.FromCopper(Amount),
+                Player,
+                OtherPlayer,
                 DateTimeOffset.FromUnixTimeSeconds(Time));
         }
     }

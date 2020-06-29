@@ -9,6 +9,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccountingData", "AccountingData", "{860C6637-A97F-4705-91C2-E2CD71A38F33}"
 ProjectSection(SolutionItems) = preProject
 	Accounting_Razorgore_income.csv = Accounting_Razorgore_income.csv
+	Accounting_Razorgore_expenses.csv = Accounting_Razorgore_expenses.csv
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Web", "FrozenGold.Web\FrozenGold.Web.csproj", "{6CB5B026-1CDC-4AA9-9376-AD39AE515513}"

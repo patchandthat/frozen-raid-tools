@@ -1,52 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using CsvHelper;
 
 namespace FrozenGold.Console
 {
-    class ConsoleDataSource : IDataSource
-    {
-        const string reportfile = "./Accounting_Razorgore_income.csv";
-        
-        public Roster GetRoster()
-        {
-            return new FrozenRoster();
-        }
-
-        public Tariff GetTariff()
-        {
-            return new FrozenTariff();
-        }
-
-        public IReadOnlyList<Transaction> GetTransactionHistory()
-        {
-            using (var reader = new StreamReader(reportfile))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                var rows = csv
-                    .GetRecords<AccountingCsvRow>()
-                    .Select(row => row.ToTransaction())
-                    .Where(txn =>
-                        txn.PlayerFrom == "Frozengold" || txn.PlayerTo == "Frozengold")
-                    .ToList();
-
-                return rows;
-            }
-        }
-
-        public DateTimeOffset GetLastUpdatedDate()
-        {
-            FileInfo fi = new FileInfo(reportfile);
-
-            return new DateTimeOffset(fi.CreationTimeUtc);
-        }
-
-        public DateTimeOffset NowServerTime => DateTimeOffset.UtcNow;
-    }
-
     class Program
     {
         static void Main(string[] args)
@@ -66,8 +23,10 @@ namespace FrozenGold.Console
             
             System.Console.WriteLine("");
             System.Console.WriteLine($"Gold collected: {report.Received}");
-            System.Console.WriteLine($"Gold sent:      {report.SentToBanker}"); // txns out missing?
+            System.Console.WriteLine($"Gold sent:      {report.SentToBanker}");
             System.Console.WriteLine($"Gold on hand:   {report.GoldOnHand}");
+            System.Console.WriteLine($"Mailbox fees:   {report.MailboxFees}");
+            System.Console.WriteLine($"Refunds:        {report.Refunded}");
             
             System.Console.WriteLine("");
             int oddTxnCount = report.OddTransactions.Count();
