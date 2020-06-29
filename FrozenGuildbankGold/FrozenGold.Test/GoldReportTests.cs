@@ -136,6 +136,7 @@ namespace FrozenGold.tests
                 .Add(new Player("Jiwari"))
                 .Add(new Player("Pykkles"))
                 .Add(new Player("Fesha"));
+            
             var tariff = new Tariff
             {
                 History = new []

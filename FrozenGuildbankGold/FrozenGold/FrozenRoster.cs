@@ -1,3 +1,5 @@
+using System;
+
 namespace FrozenGold
 {
     public class FrozenRoster : Roster
@@ -5,14 +7,14 @@ namespace FrozenGold
         public FrozenRoster()
         {
             this
-                .Add(new Player("Azgard"))
+                .Add(new Player("Azgard", "Azgabank"))
                 .Add(new Player("Balthassar"))
                 .Add(new Player("Wolfsbane"))
 
                 .Add(new Player("Scorepan"))
                 .Add(new Player("Horlof"))
                 .Add(new Player("Celehorn"))
-                .Add(new Player("Xaosan"))
+                .Add(new Player("Xaosan", "Gundao"))
                 .Add(new Player("Celee"))
                 .Add(new Player("Phaedon"))
                 .Add(new Player("Neffer"))
@@ -24,7 +26,7 @@ namespace FrozenGold
                 .Add(new Player("Kanaljen"))
 
                 .Add(new Player("Fixeh"))
-                .Add(new Player("Maroderen"))
+                .Add(new Player("Marodören"))
                 .Add(new Player("Rikxx"))
                 .Add(new Player("Whi"))
                 .Add(new Player("Deceptions"))
@@ -32,8 +34,9 @@ namespace FrozenGold
                 .Add(new Player("Poutana"))
                 .Add(new Player("Jione"))
                 .Add(new Player("Akks"))
-                .Add(new Player("Tyr"))
+                .Add(new Player("Týr"))
                 .Add(new Player("Strongstra"))
+                .Add(new Player("Jawewarrior"))
                 .Add(new Player("Eresant"))
                 .Add(new Player("Elcabra"))
                 .Add(new Player("Moonrock"))
@@ -44,7 +47,7 @@ namespace FrozenGold
                 .Add(new Player("Enslave"))
                 .Add(new Player("Spidle"))
                 .Add(new Player("Exspes"))
-                .Add(new Player("Ceeben"))
+                .Add(new Player("Ceeben", "Lähitapiola"))
                 .Add(new Player("Kuzuri"))
                 .Add(new Player("Darchi"))
                 .Add(new Player("Bezbani"))
@@ -53,7 +56,11 @@ namespace FrozenGold
                 .Add(new Player("Frostmon"))
                 .Add(new Player("Anthraxx"))
                 .Add(new Player("Stompalomp"))
-                .Add(new Player("Buksy"));
+                .Add(new Player("Buksy"))
+                .Add(new Player("Gicanu")
+                {
+                    LeftOn = new DateTimeOffset(2020, 06, 25, 22, 0, 0, TimeSpan.Zero)
+                });
         }
     }
 }

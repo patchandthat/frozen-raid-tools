@@ -67,5 +67,10 @@ namespace FrozenGold
         {
             return (Main != null ? Main.GetHashCode() : 0);
         }
+
+        public override string ToString()
+        {
+            return Main.Name;
+        }
     }
 }

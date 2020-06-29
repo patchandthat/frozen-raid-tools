@@ -20,6 +20,7 @@
     <ItemGroup>
       <Content Include="..\Accounting_Razorgore_income.csv">
         <Link>Accounting_Razorgore_income.csv</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 

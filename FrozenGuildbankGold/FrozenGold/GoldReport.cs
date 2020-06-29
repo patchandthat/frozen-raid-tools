@@ -29,6 +29,7 @@ namespace FrozenGold
             SentToBanker = CurrencyAmount.Zero;
             MailboxFees = CurrencyAmount.Zero;
             PlayerReports = Enumerable.Empty<PlayerReport>();
+            _oddTransactions = new List<Transaction>();
         }
 
         public CurrencyAmount Received { get; private set; }
@@ -120,6 +121,11 @@ namespace FrozenGold
                 {
                     SentToBanker += tx.Amount;
                     MailboxFees += CurrencyAmount.FromCopper(30);
+                }
+                else
+                {
+                    // Shouldn't really have any txns that don't fall into the two cases above...
+                    _oddTransactions.Add(tx);
                 }
             }
         }

@@ -18,7 +18,7 @@ namespace FrozenGold.Console
         public string Player { get; set; }
         
         [Name("time")]
-        public uint Time { get; }
+        public long Time { get; set; }
 
         public Transaction ToTransaction()
         {
