@@ -94,5 +94,17 @@ namespace FrozenGold
         
         public static bool operator !=(CurrencyAmount a, CurrencyAmount b)
             => !Equals(a, b);
+
+        public static bool operator >(CurrencyAmount a, CurrencyAmount b)
+            => a.TotalCopper > b.TotalCopper;
+
+        public static bool operator <(CurrencyAmount a, CurrencyAmount b)
+            => a.TotalCopper < b.TotalCopper;
+        
+        public static bool operator >=(CurrencyAmount a, CurrencyAmount b)
+            => a.TotalCopper >= b.TotalCopper;
+
+        public static bool operator <=(CurrencyAmount a, CurrencyAmount b)
+            => a.TotalCopper <= b.TotalCopper;
     }
 }

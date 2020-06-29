@@ -6,14 +6,15 @@ namespace FrozenGold
 {
     public class GoldReport
     {
-        private readonly IDataSource _dataSource;
-        public const string Taxman = "FrozenGold";
+        public const string Taxman = "Frozengold";
         public const string Banker = "Frozbank";
+        
+        private readonly IDataSource _dataSource;
 
         private readonly Roster _roster;
         private readonly Tariff _tariff;
         private readonly IReadOnlyList<Transaction> _transactions;
-        private List<Transaction> _badTransactions;
+        private readonly List<Transaction> _oddTransactions;
 
         public GoldReport(IDataSource dataSource)
         {
@@ -26,12 +27,14 @@ namespace FrozenGold
             
             Received = CurrencyAmount.Zero;
             SentToBanker = CurrencyAmount.Zero;
+            MailboxFees = CurrencyAmount.Zero;
             PlayerReports = Enumerable.Empty<PlayerReport>();
         }
-        
+
         public CurrencyAmount Received { get; private set; }
         public CurrencyAmount SentToBanker { get; private set; }
-        public CurrencyAmount GoldOnHand => Received - SentToBanker;
+        public CurrencyAmount MailboxFees { get; private set; }
+        public CurrencyAmount GoldOnHand => Received - (SentToBanker + MailboxFees);
 
         public IEnumerable<Transaction> AllTransactions => _transactions;
 
@@ -39,49 +42,32 @@ namespace FrozenGold
         /// Should be empty unless gold was received from an unrecognised character
         /// The roster probably needs updating for those foreign types with accents in their names.
         /// </summary>
-        public IEnumerable<Transaction> UnprocessedTransactions => _badTransactions;
-        
+        public IEnumerable<Transaction> OddTransactions => _oddTransactions;
         public IEnumerable<PlayerReport> PlayerReports { get; private set; }
         public DateTimeOffset LastUpdated { get; }
 
-        public class PlayerReport
-        {
-            public PlayerReport(Player player)
-            {
-                Player = player;
-                
-                AmountPaid = CurrencyAmount.Zero;
-                AmountDueToDate = CurrencyAmount.Zero;
-            }
-
-            public Player Player { get; private set; }
-            public CurrencyAmount AmountPaid { get; set; }
-            public CurrencyAmount AmountDueToDate { get; set; }
-            
-            // Todo: Get Summary
-        }
-        
         public void BuildReport()
         {
-            _badTransactions = new List<Transaction>();
+            _oddTransactions.Clear();
             Received = CurrencyAmount.Zero;
             SentToBanker = CurrencyAmount.Zero;
-            
+            MailboxFees = CurrencyAmount.Zero;
+
             var playerReports = new Dictionary<Player, PlayerReport>();
 
             CalculateDues(playerReports);
-            // ProcessTransactions(playerReports);
+            ProcessTransactions(playerReports);
 
             PlayerReports = playerReports
                 .Select(kvp => kvp.Value)
                 .ToList();
         }
-
+        
         private void CalculateDues(Dictionary<Player, PlayerReport> playerReports)
         {
             foreach (Player player in _roster.Players)
             {
-                playerReports[player] = new PlayerReport(player);
+                playerReports[player] = new PlayerReport(player, _tariff.CurrentRate);
 
                 int tariffIndex = 0;
                 TariffItem currentRate = _tariff.History[tariffIndex];
@@ -101,7 +87,7 @@ namespace FrozenGold
                     
                     var intervalEndDate = currentDate + currentRate.RepeatInterval;
                     
-                    if (player.IsRetired && player.RetiredOn < intervalEndDate)
+                    if (player.IsRetired && player.LeftOn < intervalEndDate)
                         break;
                     
                     if (player.JoinedOn < intervalEndDate)
@@ -111,46 +97,31 @@ namespace FrozenGold
                 }
             }
         }
-
+        
         private void ProcessTransactions(Dictionary<Player, PlayerReport> playerReports)
         {
-            foreach (Transaction tx in _transactions)
+            foreach (var tx in _transactions)
             {
                 if (tx.PlayerTo == Taxman)
                 {
                     Received += tx.Amount;
-
+                    
                     var player = _roster.Find(tx.PlayerFrom);
                     if (player == null)
                     {
-                        _badTransactions.Add(tx);
+                        _oddTransactions.Add(tx);
                         continue;
                     }
 
-                    if (!playerReports.TryGetValue(player, out PlayerReport report))
-                    {
-                        report = new PlayerReport(player);
-                        playerReports[player] = report;
-                    }
-
+                    var report = playerReports[player];
                     report.AmountPaid += tx.Amount;
                 }
-                else if (tx.PlayerFrom == Taxman && tx.PlayerTo == Banker)
+                else if (tx.PlayerTo == Banker && tx.PlayerFrom == Taxman)
                 {
                     SentToBanker += tx.Amount;
-                }
-                else
-                {
-                    _badTransactions.Add(tx);
+                    MailboxFees += CurrencyAmount.FromCopper(30);
                 }
             }
         }
-    }
-
-    public enum PaymentStatus
-    {
-        Deficit,
-        Paid,
-        Credit
     }
 }

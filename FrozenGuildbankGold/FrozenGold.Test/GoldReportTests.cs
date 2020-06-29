@@ -253,7 +253,7 @@ namespace FrozenGold.tests
             var roster = new Roster()
                 .Add(new Player("Neffer")
                 {
-                    RetiredOn = tariff.CurrentRate.BeginsOn.AddDays(9)
+                    LeftOn = tariff.CurrentRate.BeginsOn.AddDays(9)
                 });
             
             var now =
@@ -314,9 +314,435 @@ namespace FrozenGold.tests
         }
 
         [Fact]
-        public void BuildReport_WithMultipleRatesAndPlayers_CalculatesCorrectAmountDueForEachPlayer()
+        public void BuildReport_WithMultipleRatesAndPlayersWithDifferentMembershipDurations_CalculatesCorrectAmountDueForEachPlayer()
         {
-            Assert.True(false, "Write me");
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    },
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(20),
+                        BeginsOn = firstRateStart.AddDays(21),
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    },
+                }
+            };
+            
+            var roster = new Roster()
+                .Add(new Player("Neffer"))
+                .Add(new Player("Demusske")
+                {
+                    JoinedOn = firstRateStart.AddDays(7)
+                })
+                .Add(new Player("Dizzay")
+                {
+                    LeftOn = firstRateStart.AddDays(28) 
+                })
+                .Add(new Player("Unboned")
+                {
+                    LeftOn = firstRateStart.AddDays(-5)
+                });
+            
+            // 3 weeks of 40g, 5 weeks of 20g
+            var now = firstRateStart.AddDays(7 * 8);
+            CurrencyAmount nefferExpectedDue = CurrencyAmount.FromGold(220);
+            CurrencyAmount demusskeExpectedDue = CurrencyAmount.FromGold(180);
+            CurrencyAmount dizzayExpectedDue = CurrencyAmount.FromGold(140);
+            CurrencyAmount unbonedExpectedDue = CurrencyAmount.FromGold(0);
+                
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            
+            var sut = CreateSut();
+            sut.BuildReport();
+            
+            var neffer = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Neffer");
+            var demusske = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Demusske");
+            var dizzay = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Dizzay");
+            var unboned = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Unboned");
+
+            neffer.AmountDueToDate.Should().Be(nefferExpectedDue);
+            demusske.AmountDueToDate.Should().Be(demusskeExpectedDue);
+            dizzay.AmountDueToDate.Should().Be(dizzayExpectedDue);
+            unboned.AmountDueToDate.Should().Be(unbonedExpectedDue);
+        }
+
+        [Fact]
+        public void BuildReport_WhenRosterMainCharacterSentMoneyToTaxman_AddsToTotalForPlayer()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"));
+
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddDays(1)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddDays(9)), 
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+
+            var neffer = sut.PlayerReports.Single();
+
+            neffer.AmountPaid.Should().Be(CurrencyAmount.FromGold(80));
+        }
+        
+        [Fact]
+        public void BuildReport_WhenRosterAltCharacterSentMoneyToTaxman_AddsToTotalForPlayer()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer", "Confused", "Marnaa"))
+                .Add(new Player("Jiwari"));
+
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Marnaa",
+                    "Frozengold",
+                    firstRateStart.AddDays(1)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Marnaa",
+                    "Frozengold",
+                    firstRateStart.AddDays(9)), 
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+
+            var neffer = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Neffer");
+
+            neffer.AmountPaid.Should().Be(CurrencyAmount.FromGold(80));
+        }
+        
+        [Fact]
+        public void BuildReport_WhenRosterCharacterSentMoneyToTaxman_AddsToTotalReceived()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer", "Confused", "Marnaa"))
+                .Add(new Player("Jiwari"));
+
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Marnaa",
+                    "Frozengold",
+                    firstRateStart.AddDays(1)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(10), 
+                    "Jiwari",
+                    "Frozengold",
+                    firstRateStart.AddDays(9)), 
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+
+            sut.Received.Should().Be(CurrencyAmount.FromGold(50));
+        }
+
+        [Fact]
+        public void BuildReport_WhenTaxmanSentMoneyToBanker_AddsToTotalSent()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"));
+
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddDays(1)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(20), 
+                    "Frozengold",
+                    "Frozbank",
+                    firstRateStart.AddDays(9)), 
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+
+            sut.SentToBanker.Should().Be(CurrencyAmount.FromGold(20));
+        }
+
+        [Fact]
+        public void ctor_WhenCalled_MailboxFeesIsZero()
+        {
+            var sut = CreateSut();
+
+            sut.MailboxFees.Should().Be(CurrencyAmount.Zero);
+        }
+        
+        [Fact]
+        public void BuildReport_WhenMoneySentToBanker_MailboxFeesIncreaseBy30Copper()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"));
+
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddDays(1)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(20), 
+                    "Frozengold",
+                    "Frozbank",
+                    firstRateStart.AddDays(9)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(5), 
+                    "Frozengold",
+                    "Frozbank",
+                    firstRateStart.AddDays(9)), 
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+            
+            sut.MailboxFees.Should().Be(CurrencyAmount.FromCopper(60));
+        }
+
+        [Fact]
+        public void BuildReport_WhenMoneyReceivedAndSentToBanker_GoldOnHandIsCorrectWithMailboxFees()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"));
+
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(40), 
+                    "Neffer",
+                    "Frozengold",
+                    firstRateStart.AddDays(1)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(20), 
+                    "Frozengold",
+                    "Frozbank",
+                    firstRateStart.AddDays(9)), 
+                new Transaction(
+                    TransactionType.MoneyTransfer,
+                    CurrencyAmount.FromGold(5), 
+                    "Frozengold",
+                    "Frozbank",
+                    firstRateStart.AddDays(9)), 
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+
+            sut.GoldOnHand.Should().Be(new CurrencyAmount(14, 99, 40));
+        }
+
+        [Fact]
+        public void BuildReport_WhenPlayerNotInRosterSentGoldToTaxman_AddsToCollectionOfOddTransactions()
+        {
+            var firstRateStart = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1));
+            var now = firstRateStart.AddDays(14);
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    new TariffItem
+                    {
+                        Amount = CurrencyAmount.FromGold(40),
+                        BeginsOn = firstRateStart,
+                        RepeatInterval = TimeSpan.FromDays(7)
+                    }
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"));
+
+            Transaction oddTransaction = new Transaction(
+                TransactionType.MoneyTransfer,
+                CurrencyAmount.FromGold(40),
+                "Jiwari",
+                "Frozengold",
+                firstRateStart.AddDays(1));
+            IReadOnlyList<Transaction> transactions = new []
+            {
+                oddTransaction
+            };
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            A.CallTo(() => _dataSource.NowServerTime).Returns(now);
+            A.CallTo(() => _dataSource.GetTransactionHistory()).Returns(transactions);
+
+            var sut = CreateSut();
+            
+            sut.BuildReport();
+            
+            var neffer = sut.PlayerReports.Single(pr => pr.Player.Main.Name == "Neffer");
+
+            neffer.AmountPaid.Should().Be(CurrencyAmount.Zero);
+
+            sut.OddTransactions.Count().Should().Be(1);
+            sut.OddTransactions.Should().Contain(oddTransaction);
         }
     }
 }

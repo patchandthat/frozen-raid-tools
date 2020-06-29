@@ -23,8 +23,8 @@ namespace FrozenGold
         }
 
         public Character Main { get; private set; }
-        public bool IsRetired => RetiredOn != null;
-        public DateTimeOffset? RetiredOn { get; set; }
+        public bool IsRetired => LeftOn != null;
+        public DateTimeOffset? LeftOn { get; set; }
         public DateTimeOffset JoinedOn { get; set; }
 
         public IReadOnlyList<Character> Alts

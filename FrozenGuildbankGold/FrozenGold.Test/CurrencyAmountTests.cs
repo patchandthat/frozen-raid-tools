@@ -259,5 +259,113 @@ namespace FrozenGold.tests
 
             sut.ToString().Should().Be("4g 3s 2c");
         }
+
+        [Fact]
+        public void OperatorGT_WhenFirstAmountIsGreater_ReturnsTrue()
+        {
+            var first = CurrencyAmount.FromGold(2);
+            var second = CurrencyAmount.FromGold(1);
+
+            (first > second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorGT_WhenSecondAmountIsGreater_ReturnsFalse()
+        {
+            var first = CurrencyAmount.FromSilver(1);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first > second).Should().BeFalse();
+        }
+        
+        [Fact]
+        public void OperatorGT_WhenAmountsEqual_ReturnsFalse()
+        {
+            var first = CurrencyAmount.FromGold(2);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first > second).Should().BeFalse();
+        }
+        
+        [Fact]
+        public void OperatorLT_WhenFirstAmountIsGreater_ReturnsFalse()
+        {
+            var first = CurrencyAmount.FromGold(1);
+            var second = CurrencyAmount.FromSilver(2);
+
+            (first < second).Should().BeFalse();
+        }
+        
+        [Fact]
+        public void OperatorLT_WhenSecondAmountIsGreater_ReturnsTrue()
+        {
+            var first = CurrencyAmount.FromGold(1);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first < second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorLT_WhenAmountsEqual_ReturnsFalse()
+        {
+            var first = CurrencyAmount.FromGold(2);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first < second).Should().BeFalse();
+        }
+        
+        [Fact]
+        public void OperatorGTE_WhenFirstAmountIsGreater_ReturnsTrue()
+        {
+            var first = CurrencyAmount.FromGold(2);
+            var second = CurrencyAmount.FromGold(1);
+
+            (first >= second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorGTE_WhenSecondAmountIsGreater_ReturnsFalse()
+        {
+            var first = CurrencyAmount.FromSilver(1);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first >= second).Should().BeFalse();
+        }
+        
+        [Fact]
+        public void OperatorGTE_WhenAmountsEqual_ReturnsTrue()
+        {
+            var first = CurrencyAmount.FromGold(2);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first >= second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorLTE_WhenFirstAmountIsGreater_ReturnsFalse()
+        {
+            var first = CurrencyAmount.FromGold(1);
+            var second = CurrencyAmount.FromSilver(2);
+
+            (first <= second).Should().BeFalse();
+        }
+        
+        [Fact]
+        public void OperatorLTE_WhenSecondAmountIsGreater_ReturnsTrue()
+        {
+            var first = CurrencyAmount.FromGold(1);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first <= second).Should().BeTrue();
+        }
+        
+        [Fact]
+        public void OperatorLTE_WhenAmountsEqual_ReturnsTrue()
+        {
+            var first = CurrencyAmount.FromGold(2);
+            var second = CurrencyAmount.FromGold(2);
+
+            (first <= second).Should().BeTrue();
+        }
     }
 }
