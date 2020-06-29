@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject HttpClient Http
+@inject GoldReportService ReportService
 
 <div class="sidebar">
     <NavMenu />
@@ -6,10 +8,23 @@
 
 <div class="main">
     <div class="top-row px-4">
-        <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+        @*<span class="ml-md-auto">Report issues to Neffer</span>*@
     </div>
 
     <div class="content px-4">
         @Body
     </div>
 </div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var transactions = await Http.GetFromJsonAsync<FrozenGold.Web.Services.TransactionHistory>("api/transactions");
+        var ds = new FrozenGold.Web.Services.DataSource(transactions);
+        var report = new GoldReport(ds);
+        report.BuildReport();
+
+        ReportService.Report = report;
+    }
+}

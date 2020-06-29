@@ -1,0 +1,23 @@
+﻿@page "/players"
+@inject GoldReportService ReportService
+
+<h1>Players</h1>
+
+@if (ReportService.Report == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>Todo: Summary for each player</div>
+}
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        ReportService.ReportUpdated += (s, e) => this.StateHasChanged();
+    }
+}

@@ -1,10 +1,14 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FrozenGold
 {
     public class PlayerReport
     {
         private readonly TariffItem _currentTariff;
+        private PlayerReportSummary _summary;
+        private CurrencyAmount _amountPaid;
+        private CurrencyAmount _amountDueToDate;
 
         public PlayerReport(Player player, TariffItem currentTariff)
         {
@@ -16,18 +20,40 @@ namespace FrozenGold
         }
 
         public Player Player { get; }
-        public CurrencyAmount AmountPaid { get; set; }
-        public CurrencyAmount AmountDueToDate { get; set; }
+
+        public CurrencyAmount AmountPaid
+        {
+            get { return _amountPaid; }
+            set
+            {
+                _summary = null;
+                _amountPaid = value;
+            }
+        }
+
+        public CurrencyAmount AmountDueToDate
+        {
+            get { return _amountDueToDate; }
+            set
+            {
+                _summary = null;
+                _amountDueToDate = value;
+            }
+        }
 
         public PlayerReportSummary ReportSummary
         {
             get
             {
-                if (AmountPaid == AmountDueToDate)
-                    return new PlayerReportSummary(
-                        PlayerPaymentStatus.PaidInFull, 0);
+                if (_summary != null) return _summary;
 
-                if (AmountPaid > AmountDueToDate)
+                if (AmountPaid == AmountDueToDate)
+                {
+                    _summary = new PlayerReportSummary(
+                        PlayerPaymentStatus.PaidInFull,
+                        0);
+                }
+                else if (AmountPaid > AmountDueToDate)
                 {
                     var surplus = AmountPaid - AmountDueToDate;
                     int weeksCovered = 0;
@@ -38,8 +64,8 @@ namespace FrozenGold
                         weeksCovered++;
                         amount += _currentTariff.Amount;                        
                     }
-                    
-                    return new PlayerReportSummary(
+
+                    _summary = new PlayerReportSummary(
                         PlayerPaymentStatus.Ahead,
                         weeksCovered);
                 }
@@ -55,10 +81,12 @@ namespace FrozenGold
                         amount += _currentTariff.Amount;                        
                     }
 
-                    return new PlayerReportSummary(
+                    _summary = new PlayerReportSummary(
                         PlayerPaymentStatus.Behind,
                         weeksBehind);
                 }
+
+                return _summary;
             }
         }
     }

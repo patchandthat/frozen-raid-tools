@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FrozenGold.Api
+namespace FrozenGold.Web.Services
 {
     public class TransactionHistory
     {

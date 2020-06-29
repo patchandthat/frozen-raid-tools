@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using FrozenGold.Web.Services;
 
 namespace FrozenGold.Web
 {
@@ -17,7 +18,13 @@ namespace FrozenGold.Web
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            var services = builder.Services;
+
+            services.AddTransient(sp => new HttpClient
+            {
+                BaseAddress = new Uri("https://frozengoldapi.azurewebsites.net")
+            });
+            services.AddSingleton<GoldReportService>();
 
             await builder.Build().RunAsync();
         }

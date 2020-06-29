@@ -2,7 +2,7 @@ using System;
 
 namespace FrozenGold
 {
-    public class CurrencyAmount : IEquatable<CurrencyAmount>
+    public class CurrencyAmount : IEquatable<CurrencyAmount>, IComparable<CurrencyAmount>
     {
         public CurrencyAmount(uint gold, uint silver, uint copper)
         {
@@ -62,6 +62,13 @@ namespace FrozenGold
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Gold == other.Gold && Silver == other.Silver && Copper == other.Copper;
+        }
+
+        public int CompareTo(CurrencyAmount other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            
+            return this.TotalCopper.CompareTo(other.TotalCopper);
         }
 
         public override bool Equals(object obj)

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -19,15 +19,28 @@ namespace FrozenGold.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        [EnableCors]
         [HttpGet]
         public TransactionHistory Get()
         {
             try
             {
+                var transactions = _dataSource
+                    .GetTransactionHistory()
+                    .Select(tx => new TransactionDto
+                    {
+                        WhenServerTime = tx.WhenServerTime,
+                        CopperAmount = tx.Amount.TotalCopper,
+                        PlayerFrom = tx.PlayerFrom,
+                        PlayerTo = tx.PlayerTo,
+                        Type = tx.Type
+                    })
+                    .ToArray();
+
                 return new TransactionHistory
                 {
                     LastUpdated = _dataSource.GetLastUpdatedDate(),
-                    Transactions = _dataSource.GetTransactionHistory().ToArray()
+                    Transactions = transactions
                 };
             }
             catch (Exception e)

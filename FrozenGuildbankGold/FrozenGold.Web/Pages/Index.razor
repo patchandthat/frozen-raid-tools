@@ -1,7 +1,105 @@
 ﻿@page "/"
+@inject GoldReportService ReportService
 
-<h1>Hello, world!</h1>
+@if (ReportService.Report == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="container mb-5">
+        <h1>Summary</h1>
+        <div class="row px-2 py-1"><div class="col col-sm"><strong>Total gold received:</strong></div><div class="col-lg-10"> @ReportService.Report.Received.ToString()</div></div>
+        <div class="row px-2 py-1"><div class="col col-sm"><strong>Sent to Frozbank:</strong></div><div class="col-lg-10"> @ReportService.Report.SentToBanker.ToString()</div></div>
+        <div class="row px-2 py-1"><div class="col col-sm"><strong>Gold on hand:</strong></div><div class="col-lg-10"> @ReportService.Report.GoldOnHand.ToString()</div></div>
+        <div class="row px-2 py-1"><div class="col col-sm"><strong>Refunded:</strong></div><div class="col-lg-10"> @ReportService.Report.Refunded.ToString()</div></div>
+        <div class="row px-2 py-1"><div class="col col-sm"><strong>Mailbox fees:</strong></div><div class="col-lg-10"> @ReportService.Report.MailboxFees.ToString()</div></div>
+    </div>
 
-Welcome to your new app.
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3>@latePayments.Count Missing payments</h3>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Who</th>
+                            <th>How much behind</th>
+                            <th># weeks behind</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (PlayerReport pr in latePayments)
+                        {
+                        <tr>
+                            <td>@pr.Player.Main.Name</td>
+                            <td>@(pr.AmountDueToDate - pr.AmountPaid)</td>
+                            <td>@pr.ReportSummary.WeeksDifference</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h3>@inCredit.Count Paid in advance</h3>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Who</th>
+                            <th>How much extra</th>
+                            <th># weeks covered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (PlayerReport pr in inCredit)
+                        {
+                            <tr>
+                                <td>@pr.Player.Main.Name</td>
+                                <td>@(pr.AmountPaid - pr.AmountDueToDate)</td>
+                                <td>@pr.ReportSummary.WeeksDifference</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+            
+    </div>
+}
+
+@code {
+
+    private List<PlayerReport> latePayments = new List<PlayerReport>();
+    private List<PlayerReport> inCredit = new List<PlayerReport>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        PopulateLists();
+
+        ReportService.ReportUpdated += (s, e) =>
+        {
+            PopulateLists();
+
+            this.StateHasChanged();
+        };
+    }
+
+    private void PopulateLists()
+    {
+        if (ReportService.Report == null) return;
+
+        latePayments = ReportService.Report.PlayerReports
+                .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Behind)
+                .OrderByDescending(p => (p.AmountDueToDate - p.AmountPaid))
+                .ToList();
+
+        inCredit = ReportService.Report.PlayerReports
+            .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Ahead)
+            .OrderByDescending(p => p.AmountPaid - p.AmountDueToDate)
+            .ToList();
+    }
+}
