@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold.Console", "Froze
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold.Web", "FrozenGold.Web\FrozenGold.Web.csproj", "{6CB5B026-1CDC-4AA9-9376-AD39AE515513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrozenGold.Api", "FrozenGold.Api\FrozenGold.Api.csproj", "{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrozenGold.Api", "FrozenGold.Api\FrozenGold.Api.csproj", "{87AAF0D1-6A86-4847-8FFC-1CF4AC6BC7B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

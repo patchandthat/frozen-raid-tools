@@ -1,25 +1,39 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace FrozenGold
 {
     public class PlayerReport
     {
+        private readonly Tariff _tariff;
         private readonly TariffItem _currentTariff;
         private PlayerReportSummary _summary;
         private CurrencyAmount _amountPaid;
         private CurrencyAmount _amountDueToDate;
 
-        public PlayerReport(Player player, TariffItem currentTariff)
+        public PlayerReport(Player player, Tariff tariff)
         {
-            _currentTariff = currentTariff ?? throw new ArgumentNullException(nameof(currentTariff));
+            _tariff = tariff ?? throw new ArgumentNullException(nameof(tariff));
+            _currentTariff = tariff.CurrentRate;
             Player = player ?? throw new ArgumentNullException(nameof(player));
-                
+
             AmountPaid = CurrencyAmount.Zero;
             AmountDueToDate = CurrencyAmount.Zero;
         }
 
         public Player Player { get; }
+
+        public DateTimeOffset PaymentsStartFrom
+        {
+            get
+            {
+                var joined = this.Player.JoinedOn;
+                var firstTariffStart = _tariff.History[0].BeginsOn;
+
+                if (joined > firstTariffStart)
+                    return joined;
+                return firstTariffStart;
+            }
+        }
 
         public CurrencyAmount AmountPaid
         {

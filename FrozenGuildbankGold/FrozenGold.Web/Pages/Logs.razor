@@ -1,36 +1,67 @@
 @page "/logs"
 @inject GoldReportService ReportService
 
-<h1>All Transactions</h1>
+    <div class="container">
 
-@if (ReportService.Report == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Amount</th>
-                <th>When</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Transaction t in ReportService.Report.AllTransactions.OrderBy(tx => tx.WhenServerTime))
-                {
+        @if (ReportService.Report == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <h3>All Transactions</h3>
+            
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@t.PlayerFrom</td>
-                        <td>@t.PlayerTo</td>
-                        <td>@t.Amount</td>
-                        <td>@t.WhenServerTime.ToString("D")</td>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Amount</th>
+                        <th>When</th>
                     </tr>
-                }
-        </tbody>
-    </table>
-}
+                </thead>
+                <tbody>
+                    @foreach (Transaction t in ReportService.Report.AllTransactions.OrderBy(tx => tx.WhenServerTime))
+                    {
+                        <tr>
+                            <td>@t.PlayerFrom</td>
+                            <td>@t.PlayerTo</td>
+                            <td>@t.Amount</td>
+                            <td>@t.WhenServerTime.ToString("D")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (ReportService.Report.OddTransactions.Any())
+            {
+                <h3 class="mt-5">Ignored Transactions <small class="text-muted"> These characters are probably missing from the roster</small></h3>
+                
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Amount</th>
+                        <th>When</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (Transaction t in ReportService.Report.OddTransactions.OrderBy(tx => tx.WhenServerTime))
+                    {
+                        <tr>
+                            <td>@t.PlayerFrom</td>
+                            <td>@t.PlayerTo</td>
+                            <td>@t.Amount</td>
+                            <td>@t.WhenServerTime.ToString("D")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        }
+
+    </div>
 
 @code {
 

@@ -80,7 +80,7 @@ namespace FrozenGold
         {
             foreach (Player player in _roster.Players)
             {
-                playerReports[player] = new PlayerReport(player, _tariff.CurrentRate);
+                playerReports[player] = new PlayerReport(player, _tariff);
 
                 int tariffIndex = 0;
                 TariffItem currentRate = _tariff.History[tariffIndex];

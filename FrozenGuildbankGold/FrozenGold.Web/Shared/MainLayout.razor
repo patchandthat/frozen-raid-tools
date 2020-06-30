@@ -8,7 +8,11 @@
 
 <div class="main">
     <div class="top-row px-4">
-        @*<span class="ml-md-auto">Report issues to Neffer</span>*@
+        @if (lastUpdated.HasValue)
+        {
+            <span class="ml-md-auto">Last updated @lastUpdated.Value.ToString("f")</span>
+        }
+        else {<span class="ml-md-auto"> </span>}
     </div>
 
     <div class="content px-4">
@@ -18,6 +22,8 @@
 
 @code {
 
+    private DateTimeOffset? lastUpdated;
+
     protected override async Task OnInitializedAsync()
     {
         var transactions = await Http.GetFromJsonAsync<FrozenGold.Web.Services.TransactionHistory>("api/transactions");
@@ -26,5 +32,6 @@
         report.BuildReport();
 
         ReportService.Report = report;
+        lastUpdated = report.LastUpdated;
     }
 }

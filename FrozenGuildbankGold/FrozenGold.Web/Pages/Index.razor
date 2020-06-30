@@ -1,22 +1,20 @@
 ﻿@page "/"
 @inject GoldReportService ReportService
 
-@if (ReportService.Report == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="container mb-5">
+<div class="container">
+    @if (ReportService.Report == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
         <h1>Summary</h1>
         <div class="row px-2 py-1"><div class="col col-sm"><strong>Total gold received:</strong></div><div class="col-lg-10"> @ReportService.Report.Received.ToString()</div></div>
         <div class="row px-2 py-1"><div class="col col-sm"><strong>Sent to Frozbank:</strong></div><div class="col-lg-10"> @ReportService.Report.SentToBanker.ToString()</div></div>
         <div class="row px-2 py-1"><div class="col col-sm"><strong>Gold on hand:</strong></div><div class="col-lg-10"> @ReportService.Report.GoldOnHand.ToString()</div></div>
         <div class="row px-2 py-1"><div class="col col-sm"><strong>Refunded:</strong></div><div class="col-lg-10"> @ReportService.Report.Refunded.ToString()</div></div>
-        <div class="row px-2 py-1"><div class="col col-sm"><strong>Mailbox fees:</strong></div><div class="col-lg-10"> @ReportService.Report.MailboxFees.ToString()</div></div>
-    </div>
+        <div class="row px-2 py-1 mb-5"><div class="col col-sm"><strong>Mailbox fees:</strong></div><div class="col-lg-10"> @ReportService.Report.MailboxFees.ToString()</div></div>
 
-    <div class="container">
         <div class="row">
             <div class="col">
                 <h3>@latePayments.Count Missing payments</h3>
@@ -32,11 +30,11 @@ else
                     <tbody>
                         @foreach (PlayerReport pr in latePayments)
                         {
-                        <tr>
-                            <td>@pr.Player.Main.Name</td>
-                            <td>@(pr.AmountDueToDate - pr.AmountPaid)</td>
-                            <td>@pr.ReportSummary.WeeksDifference</td>
-                        </tr>
+                            <tr>
+                                <td>@pr.Player.Main.Name</td>
+                                <td>@(pr.AmountDueToDate - pr.AmountPaid)</td>
+                                <td>@pr.ReportSummary.WeeksDifference</td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -65,10 +63,10 @@ else
                 </table>
             </div>
         </div>
-            
-    </div>
-}
 
+
+    }
+</div>
 @code {
 
     private List<PlayerReport> latePayments = new List<PlayerReport>();
@@ -93,13 +91,14 @@ else
         if (ReportService.Report == null) return;
 
         latePayments = ReportService.Report.PlayerReports
-                .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Behind)
-                .OrderByDescending(p => (p.AmountDueToDate - p.AmountPaid))
-                .ToList();
+            .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Behind)
+            .OrderByDescending(p => (p.AmountDueToDate - p.AmountPaid))
+            .ToList();
 
         inCredit = ReportService.Report.PlayerReports
             .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Ahead)
             .OrderByDescending(p => p.AmountPaid - p.AmountDueToDate)
             .ToList();
     }
+
 }
