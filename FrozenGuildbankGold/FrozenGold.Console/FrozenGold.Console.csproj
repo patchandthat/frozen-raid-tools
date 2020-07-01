@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="15.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Accounting_Razorgore_income.csv" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\FrozenGold.Api\Data\Accounting_Razorgore_expenses.csv" Link="Accounting_Razorgore_expenses.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\FrozenGold.Api\Data\Accounting_Razorgore_income.csv" Link="Accounting_Razorgore_income.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FrozenGold\FrozenGold.csproj" />
+    </ItemGroup>
+
+</Project>

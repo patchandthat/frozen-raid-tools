@@ -1,0 +1,41 @@
+﻿
+<div class="card">
+    <div class="card-header">
+        <strong>@PlayerReport.Player.Main.Name</strong>
+        @if (PlayerReport.Player.IsRetired)
+        {
+            <span class="text-muted"> (quit quit)</span>
+        }
+        </div>
+    <div class="card-body">
+        <p class="card-text">Total received: @PlayerReport.AmountPaid</p>
+        <p class="card-text">Total expected: @PlayerReport.AmountDueToDate</p>
+        <p class="card-text">First payment from: @PlayerReport.PaymentsStartFrom.ToString("dd MMM yyyy")</p>
+        @if (PlayerReport.Player.IsRetired)
+        {
+            <p class="card-text">Left on: @PlayerReport.Player.LeftOn.Value.ToString("dd MMM yyyy")</p>
+        }
+        @if(PlayerReport.Player.Alts.Any())
+        {
+            <p class="card-text">Known alts: <span class="font-weight-light">@string.Join(", ", PlayerReport.Player.Alts.Select(a => a.Name))</span></p>
+        }
+    </div>
+    @switch (PlayerReport.ReportSummary.Status)
+    {
+        case PlayerPaymentStatus.Behind:
+            <div class="card-footer bg-danger text-white"><strong>Behind</strong></div>
+            break;
+        case PlayerPaymentStatus.PaidInFull:
+            <div class="card-footer"><strong>Paid</strong></div>
+            break;
+        case PlayerPaymentStatus.Ahead:
+            <div class="card-footer bg-success text-white"><strong>Paid up front</strong></div>
+            break;
+    }
+        
+</div>
+
+@code {
+    [Parameter]
+    public PlayerReport PlayerReport { get; set; }
+}
