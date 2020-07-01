@@ -8,30 +8,14 @@
     }
     else
     {
-        <h1>Summary</h1>
-
-
-        <div class="row px-2 py-1">
-            <div class="col col-sm"><strong>Total gold received:</strong></div>
-            <div class="col-lg-10"> @ReportService.Report.Received.ToString()</div>
+        <div class="row mb-5">
+            <div class="col-md-6 mb-3">
+                <SummaryStats Report="ReportService.Report" />
+            </div>
+            <div class="col-lg-6">
+                <TariffInfo Tariff="ReportService.Report.CurrentTaxTate" />
+            </div>
         </div>
-        <div class="row px-2 py-1">
-            <div class="col col-sm"><strong>Sent to Frozbank:</strong></div>
-            <div class="col-lg-10"> @ReportService.Report.SentToBanker.ToString()</div>
-        </div>
-        <div class="row px-2 py-1">
-            <div class="col col-sm"><strong>Gold on hand:</strong></div>
-            <div class="col-lg-10"> @ReportService.Report.GoldOnHand.ToString()</div>
-        </div>
-        <div class="row px-2 py-1">
-            <div class="col col-sm"><strong>Refunded:</strong></div>
-            <div class="col-lg-10"> @ReportService.Report.Refunded.ToString()</div>
-        </div>
-        <div class="row px-2 py-1 mb-5">
-            <div class="col col-sm"><strong>Mailbox fees:</strong></div>
-            <div class="col-lg-10"> @ReportService.Report.MailboxFees.ToString()</div>
-        </div>
-
         <div class="row">
             <div class="col">
                 <h3>@latePayments.Count Missing payments</h3>

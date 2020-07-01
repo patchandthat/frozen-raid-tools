@@ -17,7 +17,7 @@ namespace FrozenGold
                 .Add(new Player("Xaosan", "Gundao"))
                 .Add(new Player("Celee"))
                 .Add(new Player("Phaedon"))
-                .Add(new Player("Neffer"))
+                .Add(new Player("Neffer", "Nefferbank"))
                 .Add(new Player("Unboned"))
                 .Add(new Player("Drunkan"))
                 .Add(new Player("Demusske"))

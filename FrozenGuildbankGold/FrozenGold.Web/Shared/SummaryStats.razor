@@ -1,5 +1,26 @@
-﻿<h3>SummaryStats</h3>
+﻿<h3>Summary</h3>
+<div class="row">
+    <div class="col-md-4"><strong>Total gold received:</strong></div>
+    <div class="col-md-8"> @Report.Received.ToString()</div>
+</div>
+<div class="row">
+    <div class="col-md-4"><strong>Sent to Frozbank:</strong></div>
+    <div class="col-md-8"> @Report.SentToBanker.ToString()</div>
+</div>
+<div class="row">
+    <div class="col-md-4"><strong>Gold on hand:</strong></div>
+    <div class="col-md-8"> @Report.GoldOnHand.ToString()</div>
+</div>
+<div class="row">
+    <div class="col-md-4"><strong>Refunded:</strong></div>
+    <div class="col-md-8"> @Report.Refunded.ToString()</div>
+</div>
+<div class="row">
+    <div class="col-md-4"><strong>Mailbox fees:</strong></div>
+    <div class="col-md-8"> @Report.MailboxFees.ToString()</div>
+</div>
 
 @code {
-
+    [Parameter]
+    public GoldReport Report { get; set; }
 }
