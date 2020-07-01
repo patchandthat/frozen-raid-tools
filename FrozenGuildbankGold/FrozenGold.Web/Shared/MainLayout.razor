@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+@inject HttpClient Http
+@inject GoldReportService ReportService
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        @if (lastUpdated.HasValue)
+        {
+            <span class="ml-md-auto">Last updated @lastUpdated.Value.ToString("f")</span>
+        }
+        else {<span class="ml-md-auto"> </span>}
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+</div>
+
+@code {
+
+    private DateTimeOffset? lastUpdated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var transactions = await Http.GetFromJsonAsync<FrozenGold.Web.Services.TransactionHistory>("api/transactions");
+        var ds = new FrozenGold.Web.Services.DataSource(transactions);
+        var report = new GoldReport(ds);
+        report.BuildReport();
+
+        ReportService.Report = report;
+        lastUpdated = report.LastUpdated;
+    }
+}

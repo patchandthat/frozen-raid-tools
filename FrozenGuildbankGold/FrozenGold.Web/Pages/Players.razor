@@ -1,0 +1,53 @@
+﻿@page "/players"
+@inject GoldReportService ReportService
+
+<div class="container">
+
+    @if (ReportService.Report == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <h3>Players</h3>
+        @for (int i = 0; i < reports.Count; i += 2)
+        {
+            <div class="row py-3">
+                <div class="col-lg-6">
+                    <PlayerCard PlayerReport="reports[i]" />
+                </div>
+                <div class="col-lg-6">
+                    @if (i + 1 < reports.Count)
+                    {
+                        <PlayerCard PlayerReport="reports[i+1]" />
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+
+    private List<PlayerReport> reports = new List<PlayerReport>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        PopulatePlayerReports();
+
+        ReportService.ReportUpdated += (s, e) =>
+        {
+            PopulatePlayerReports();
+            this.StateHasChanged();
+        };
+    }
+
+    private void PopulatePlayerReports()
+    {
+        if (ReportService.Report == null) return;
+
+        reports = ReportService.Report.PlayerReports.OrderBy(pr => pr.Player.Main.Name).ToList();
+    }
+
+}

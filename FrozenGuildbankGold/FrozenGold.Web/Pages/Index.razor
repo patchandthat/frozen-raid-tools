@@ -1,0 +1,105 @@
+﻿@page "/"
+@inject GoldReportService ReportService
+
+<div class="container">
+    @if (ReportService.Report == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row mb-5">
+            <div class="col-md-6 mb-3">
+                <SummaryStats Report="ReportService.Report" />
+            </div>
+            <div class="col-lg-6">
+                <TariffInfo Tariff="ReportService.Report.CurrentTaxTate" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>@latePayments.Count Missing payments</h3>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Who</th>
+                            <th>How much behind</th>
+                            <th># weeks behind</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (PlayerReport pr in latePayments)
+                        {
+                            <tr>
+                                <td>@pr.Player.Main.Name</td>
+                                <td>@(pr.AmountDueToDate - pr.AmountPaid)</td>
+                                <td>@pr.ReportSummary.WeeksDifference</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h3>@inCredit.Count Paid in advance</h3>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Who</th>
+                            <th>How much extra</th>
+                            <th># weeks covered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (PlayerReport pr in inCredit)
+                        {
+                            <tr>
+                                <td>@pr.Player.Main.Name</td>
+                                <td>@(pr.AmountPaid - pr.AmountDueToDate)</td>
+                                <td>@pr.ReportSummary.WeeksDifference</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    }
+</div>
+@code {
+
+    private List<PlayerReport> latePayments = new List<PlayerReport>();
+    private List<PlayerReport> inCredit = new List<PlayerReport>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        PopulateLists();
+
+        ReportService.ReportUpdated += (s, e) =>
+        {
+            PopulateLists();
+
+            this.StateHasChanged();
+        };
+    }
+
+    private void PopulateLists()
+    {
+        if (ReportService.Report == null) return;
+
+        latePayments = ReportService.Report.PlayerReports
+            .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Behind)
+            .OrderByDescending(p => (p.AmountDueToDate - p.AmountPaid))
+            .ToList();
+
+        inCredit = ReportService.Report.PlayerReports
+            .Where(pr => pr.ReportSummary.Status == PlayerPaymentStatus.Ahead)
+            .OrderByDescending(p => p.AmountPaid - p.AmountDueToDate)
+            .ToList();
+    }
+
+}
