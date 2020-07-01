@@ -1,73 +1,73 @@
 ﻿@page "/"
 @inject GoldReportService ReportService
 
-<div class="container">
-    @if (ReportService.Report == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <div class="row mb-5">
-            <div class="col-md-6 mb-3">
-                <SummaryStats Report="ReportService.Report" />
+    <div class="container">
+        @if (ReportService.Report == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row mb-5">
+                <div class="col-md-8 mb-3">
+                    <SummaryStats Report="ReportService.Report" />
+                </div>
+                <div class="col-lg-4">
+                    <TariffInfo Tariff="ReportService.Report.CurrentTaxTate" />
+                </div>
             </div>
-            <div class="col-lg-6">
-                <TariffInfo Tariff="ReportService.Report.CurrentTaxTate" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <h3>@latePayments.Count Missing payments</h3>
+            <div class="row">
+                <div class="col">
+                    <h3>@latePayments.Count Missing payments</h3>
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Who</th>
-                            <th>How much behind</th>
-                            <th># weeks behind</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (PlayerReport pr in latePayments)
-                        {
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>@pr.Player.Main.Name</td>
-                                <td>@(pr.AmountDueToDate - pr.AmountPaid)</td>
-                                <td>@pr.ReportSummary.WeeksDifference</td>
+                                <th>Who</th>
+                                <th>How much behind</th>
+                                <th># weeks behind</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="col">
-                <h3>@inCredit.Count Paid in advance</h3>
+                        </thead>
+                        <tbody>
+                            @foreach (PlayerReport pr in latePayments)
+                            {
+                                <tr class="@TableRowClassFor(pr)">
+                                    <td>@pr.Player.Main.Name</td>
+                                    <td>@(pr.AmountDueToDate - pr.AmountPaid)</td>
+                                    <td>@(pr.ReportSummary.WeeksDifference - 1)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col">
+                    <h3>@inCredit.Count Paid in advance</h3>
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Who</th>
-                            <th>How much extra</th>
-                            <th># weeks covered</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (PlayerReport pr in inCredit)
-                        {
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>@pr.Player.Main.Name</td>
-                                <td>@(pr.AmountPaid - pr.AmountDueToDate)</td>
-                                <td>@pr.ReportSummary.WeeksDifference</td>
+                                <th>Who</th>
+                                <th>How much extra</th>
+                                <th># weeks covered</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (PlayerReport pr in inCredit)
+                            {
+                                <tr>
+                                    <td>@pr.Player.Main.Name</td>
+                                    <td>@(pr.AmountPaid - pr.AmountDueToDate)</td>
+                                    <td>@pr.ReportSummary.WeeksDifference</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
 
-    }
-</div>
+        }
+    </div>
 @code {
 
     private List<PlayerReport> latePayments = new List<PlayerReport>();
@@ -102,4 +102,17 @@
             .ToList();
     }
 
+    private string TableRowClassFor(PlayerReport report)
+    {
+        var summary = report.ReportSummary;
+        if (summary.Status == PlayerPaymentStatus.Behind)
+        {
+            if (summary.WeeksDifference > 2)
+                return "table-danger";
+            if (summary.WeeksDifference > 1)
+                return "table-warning";
+        }
+
+        return "";
+    }
 }

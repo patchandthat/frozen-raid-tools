@@ -22,24 +22,6 @@ namespace FrozenGold.Console
             System.Console.WriteLine($"===== Frozen Gold Report as of {report.LastUpdated:yyyy MMMM dd} =====");
             
             System.Console.WriteLine("");
-            System.Console.WriteLine($"Gold collected: {report.Received}");
-            System.Console.WriteLine($"Gold sent:      {report.SentToBanker}");
-            System.Console.WriteLine($"Gold on hand:   {report.GoldOnHand}");
-            System.Console.WriteLine($"Mailbox fees:   {report.MailboxFees}");
-            System.Console.WriteLine($"Refunds:        {report.Refunded}");
-            
-            System.Console.WriteLine("");
-            int oddTxnCount = report.OddTransactions.Count();
-            System.Console.WriteLine($"=== Odd looking txns: {oddTxnCount} ===");
-            if (oddTxnCount > 0)
-            {
-                foreach (var txn in report.OddTransactions)
-                {
-                    System.Console.WriteLine($"   {txn.PlayerFrom} sent {txn.PlayerTo} {txn.Amount}");
-                }
-            }
-
-            System.Console.WriteLine("");
 
             System.Console.WriteLine("=== By Player ===");
             var ahead = new List<PlayerReport>();
@@ -92,6 +74,25 @@ namespace FrozenGold.Console
             foreach (var txn in report.AllTransactions.OrderBy(tx => tx.WhenServerTime))
             {
                 System.Console.WriteLine($"   {txn.PlayerFrom} sent {txn.PlayerTo} {txn.Amount} on {txn.WhenServerTime:f}");
+            }
+
+            System.Console.WriteLine("");
+            System.Console.WriteLine("=== Summary ===");
+            System.Console.WriteLine($"Gold collected: {report.Received}");
+            System.Console.WriteLine($"Gold sent:      {report.SentToBanker}");
+            System.Console.WriteLine($"Gold on hand:   {report.GoldOnHand}");
+            System.Console.WriteLine($"Mailbox fees:   {report.MailboxFees}");
+            System.Console.WriteLine($"Refunds:        {report.Refunded}");
+
+            System.Console.WriteLine("");
+            int oddTxnCount = report.OddTransactions.Count();
+            System.Console.WriteLine($"=== Odd looking txns: {oddTxnCount} ===");
+            if (oddTxnCount > 0)
+            {
+                foreach (var txn in report.OddTransactions)
+                {
+                    System.Console.WriteLine($"   {txn.PlayerFrom} sent {txn.PlayerTo} {txn.Amount}");
+                }
             }
         }
 

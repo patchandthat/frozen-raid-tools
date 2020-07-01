@@ -29,12 +29,16 @@ namespace FrozenGold.Console
             using (var incomeCsv = new CsvReader(incomeReader, CultureInfo.InvariantCulture))
             using (var expenseCsv = new CsvReader(expenseReader, CultureInfo.InvariantCulture))
             {
+                var roster = new FrozenRoster();
+                
                 var expenseRows = expenseCsv
                     .GetRecords<AccountingCsvRow>()
                     .Select(row => row.ToExpenseTransaction())
                     .Where(row => // These rows are already in the income report for FrozenGold, exclude them from the expense report of Neffer 
-                        !(row.PlayerFrom.Equals("Neffer", StringComparison.CurrentCultureIgnoreCase) &&
-                          row.PlayerTo.Equals("Frozengold", StringComparison.OrdinalIgnoreCase)));
+                    {
+                        var player = roster.Find(row.PlayerFrom);
+                        return player == null || !player.Main.Name.Equals("Neffer") || !row.PlayerTo.Equals("Frozengold", StringComparison.OrdinalIgnoreCase);
+                    });
                 
                 var rows = incomeCsv
                     .GetRecords<AccountingCsvRow>()

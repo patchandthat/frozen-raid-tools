@@ -367,5 +367,61 @@ namespace FrozenGold.tests
 
             (first <= second).Should().BeTrue();
         }
+        
+        [Fact]
+        public void ToString_WhenZero_ShouldOutputGoldSilverCopper()
+        {
+            var sut = CurrencyAmount.Zero;
+
+            sut.ToString().Should().Be("0g 0s 0c");
+        }
+        
+        [Fact]
+        public void ToString_WhenOnlyHasGoldComponent_ShouldOutputGoldOnly()
+        {
+            var sut = new CurrencyAmount(4, 0, 0);
+
+            sut.ToString().Should().Be("4g");
+        }
+        
+        [Fact]
+        public void ToString_WhenOnlyHasSilverComponent_ShouldOutputSilverOnly()
+        {
+            var sut = new CurrencyAmount(0, 3, 0);
+
+            sut.ToString().Should().Be("3s");
+        }
+        
+        [Fact]
+        public void ToString_WhenOnlyHasCopperComponent_ShouldOutputCopperOnly()
+        {
+            var sut = new CurrencyAmount(0, 0, 2);
+
+            sut.ToString().Should().Be("2c");
+        }
+        
+        [Fact]
+        public void ToString_WhenOnlyMissingGoldComponent_ShouldOutputFullFormat()
+        {
+            var sut = new CurrencyAmount(0, 3, 2);
+
+            sut.ToString().Should().Be("0g 3s 2c");
+        }
+        
+        [Fact]
+        public void ToString_WhenOnlyMissingSilverComponent_ShouldOutputFullFormat()
+        {
+            var sut = new CurrencyAmount(4, 0, 2);
+
+            sut.ToString().Should().Be("4g 0s 2c");
+        }
+        
+        [Fact]
+        public void ToString_WhenOnlyMissingCopperComponent_ShouldOutputFullFormat()
+        {
+            var sut = new CurrencyAmount(4, 3, 0);
+
+            sut.ToString().Should().Be("4g 3s 0c");
+        }
     }
 }

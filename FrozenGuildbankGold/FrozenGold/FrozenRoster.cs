@@ -30,7 +30,7 @@ namespace FrozenGold
                 .Add(new Player("Rikxx"))
                 .Add(new Player("Whi"))
                 .Add(new Player("Deceptions"))
-                .Add(new Player("Raige"))
+                .Add(new Player("Raige", "Bankaige"))
                 .Add(new Player("Poutana", "Poutanara"))
                 .Add(new Player("Jione"))
                 .Add(new Player("Akks"))

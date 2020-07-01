@@ -54,6 +54,15 @@ namespace FrozenGold
 
         public override string ToString()
         {
+            if (Gold != 0 && Silver == 0 && Copper == 0)
+                return $"{Gold}g";
+            
+            if (Gold == 0 && Silver != 0 && Copper == 0)
+                return $"{Silver}s";
+            
+            if (Gold == 0 && Silver == 0 && Copper != 0)
+                return $"{Copper}c";
+            
             return $"{Gold}g {Silver}s {Copper}c";
         }
 
