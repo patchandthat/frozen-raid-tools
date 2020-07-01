@@ -839,5 +839,35 @@ namespace FrozenGold.tests
             gicanu.AmountPaid.Should().Be(CurrencyAmount.FromGold(40));
             gicanu.AmountDueToDate.Should().Be(CurrencyAmount.FromGold(40));
         }
+        
+        [Fact]
+        public void ctor_WhenCalled_ExposesCurrentTaxRate()
+        {
+            var currentTariffItem = new TariffItem
+            {
+                Amount = CurrencyAmount.FromGold(40),
+                BeginsOn = DateTimeOffset.Now,
+                RepeatInterval = TimeSpan.FromDays(7)
+            };
+            var tariff = new Tariff
+            {
+                History = new []
+                {
+                    currentTariffItem
+                }
+            };
+
+            var roster = new Roster()
+                .Add(new Player("Neffer"));
+
+            IReadOnlyList<Transaction> transactions = new List<Transaction>();
+            
+            A.CallTo(() => _dataSource.GetRoster()).Returns(roster);
+            A.CallTo(() => _dataSource.GetTariff()).Returns(tariff);
+            
+            var sut = CreateSut();
+
+            sut.CurrentTaxTate.Should().BeSameAs(currentTariffItem);
+        }
     }
 }

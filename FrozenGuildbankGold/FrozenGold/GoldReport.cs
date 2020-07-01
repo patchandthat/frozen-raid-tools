@@ -40,6 +40,7 @@ namespace FrozenGold
         public CurrencyAmount MailboxFees { get; private set; }
         public CurrencyAmount Refunded { get; private set; }
         public CurrencyAmount GoldOnHand => Received - (SentToBanker + MailboxFees + Refunded);
+        public TariffItem CurrentTaxTate => _tariff.CurrentRate;
 
         public IEnumerable<Transaction> AllTransactions => _transactions;
 

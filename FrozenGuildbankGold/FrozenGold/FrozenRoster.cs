@@ -8,7 +8,7 @@ namespace FrozenGold
         {
             this
                 .Add(new Player("Azgard", "Azgabank"))
-                .Add(new Player("Balthassar"))
+                .Add(new Player("Balthassar", "Brokdoz"))
                 .Add(new Player("Wolfsbane"))
 
                 .Add(new Player("Scorepan"))
@@ -31,7 +31,7 @@ namespace FrozenGold
                 .Add(new Player("Whi"))
                 .Add(new Player("Deceptions"))
                 .Add(new Player("Raige"))
-                .Add(new Player("Poutana"))
+                .Add(new Player("Poutana", "Poutanara"))
                 .Add(new Player("Jione"))
                 .Add(new Player("Akks"))
                 .Add(new Player("Týr"))
@@ -39,7 +39,10 @@ namespace FrozenGold
                 .Add(new Player("Jawewarrior"))
                 .Add(new Player("Eresant"))
                 .Add(new Player("Elcabra"))
-                .Add(new Player("Moonrock"))
+                //.Add(new Player("Moonrock")
+                //{
+                    // Trial
+                //})
                 .Add(new Player("Pykkles"))
                 .Add(new Player("Onahawe"))
 

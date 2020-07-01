@@ -8,6 +8,7 @@ namespace FrozenGold.tests
     {
         private Player _player;
         private TariffItem _tariffItem;
+        private Tariff _tariff;
 
         public PlayerReportTests()
         {
@@ -19,11 +20,15 @@ namespace FrozenGold.tests
                 BeginsOn = new DateTimeOffset(2020, 06, 24, 0, 0, 0, TimeSpan.FromHours(1)),
                 RepeatInterval = TimeSpan.FromDays(7)
             };
+            _tariff = new Tariff()
+            {
+                History = new[]{_tariffItem}
+            };
         }
 
         private PlayerReport CreateSut()
         {
-            return new PlayerReport(_player, _tariffItem);
+            return new PlayerReport(_player, _tariff);
         }
 
         [Fact]
@@ -37,9 +42,9 @@ namespace FrozenGold.tests
         }
 
         [Fact]
-        public void ctor_CalledWithNullTariffItem_ThrowsArgumentNullException()
+        public void ctor_CalledWithNullTariff_ThrowsArgumentNullException()
         {
-            _tariffItem = null;
+            _tariff = null;
             
             Action ctorAction = () => CreateSut();
             
@@ -114,6 +119,59 @@ namespace FrozenGold.tests
 
             summary.Status.Should().Be(PlayerPaymentStatus.Behind);
             summary.WeeksDifference.Should().Be(2);
+        }
+
+        [Fact]
+        public void PaymentStartDate_WhenPlayerJoinedBeforeRatesStarted_FirstPaymentDateIsWhenRatesStart()
+        {
+            DateTimeOffset joinDate = DateTimeOffset.Now.AddDays(-21);
+            DateTimeOffset startDate = DateTimeOffset.Now.AddDays(-5);
+            
+            _player = new Player("Anthraxx")
+            {
+                JoinedOn = joinDate
+            };
+            
+            _tariff = new Tariff()
+            {
+                History = new []{ new TariffItem()
+                {
+                    Amount = CurrencyAmount.FromGold(1),
+                    BeginsOn = startDate,
+                }, }
+            };
+
+            var sut = CreateSut();
+
+            sut.PaymentsStartFrom.Should().Be(startDate);
+        }
+
+        [Fact]
+        public void PaymentStartDate_WhenPlayerJoinedAfterRatesStarted_FirstPaymentDateIsWhenPlayerJoined()
+        {
+            DateTimeOffset startDate = DateTimeOffset.Now.AddDays(-21);
+            DateTimeOffset joinDate = DateTimeOffset.Now.AddDays(-5);
+
+            _player = new Player("Anthraxx")
+            {
+                JoinedOn = joinDate
+            };
+
+            _tariff = new Tariff()
+            {
+                History = new[]
+                {
+                    new TariffItem()
+                    {
+                        Amount = CurrencyAmount.FromGold(1),
+                        BeginsOn = startDate,
+                    },
+                }
+            };
+
+            var sut = CreateSut();
+
+            sut.PaymentsStartFrom.Should().Be(joinDate);
         }
     }
 }
