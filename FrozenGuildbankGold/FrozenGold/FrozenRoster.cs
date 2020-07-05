@@ -2,7 +2,7 @@ using System;
 
 namespace FrozenGold
 {
-    public class FrozenRoster : Roster
+    public sealed class FrozenRoster : Roster
     {
         public FrozenRoster()
         {
@@ -37,12 +37,13 @@ namespace FrozenGold
                 .Add(new Player("Týr"))
                 .Add(new Player("Strongstra"))
                 .Add(new Player("Jawewarrior"))
-                .Add(new Player("Eresant"))
+                .Add(new Player("Eresant", "Cowwithagun", "Travelform"))
                 .Add(new Player("Elcabra"))
-                //.Add(new Player("Moonrock")
-                //{
+                .Add(new Player("Moonrock")
+                {
                     // Trial
-                //})
+                    JoinedOn = DateTimeOffset.Now.AddDays(14)
+                })
                 .Add(new Player("Pykkles"))
                 .Add(new Player("Onahawe"))
 
@@ -59,7 +60,11 @@ namespace FrozenGold
                 .Add(new Player("Frostmon"))
                 .Add(new Player("Anthraxx"))
                 .Add(new Player("Stompalomp"))
-                .Add(new Player("Buksy"))
+                .Add(new Player("Stellagosa")
+                {
+                    // Trial
+                    JoinedOn = DateTimeOffset.Now.AddDays(14)
+                })
                 .Add(new Player("Gicanu")
                 {
                     LeftOn = new DateTimeOffset(2020, 06, 25, 22, 0, 0, TimeSpan.Zero)
