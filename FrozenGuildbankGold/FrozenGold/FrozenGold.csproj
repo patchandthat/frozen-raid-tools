@@ -4,4 +4,8 @@
         <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <None Remove="FrozenRoster.cs~RF162b079.TMP" />
+    </ItemGroup>
+
 </Project>

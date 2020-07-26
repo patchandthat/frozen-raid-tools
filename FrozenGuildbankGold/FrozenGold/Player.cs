@@ -22,24 +22,15 @@ namespace FrozenGold
             if (alts != null) _alts.AddRange(alts);
         }
 
-        public Character Main { get; private set; }
-        public bool IsRetired => LeftOn != null;
+        public Character Main { get; set; }
+        public bool IsRetired() => LeftOn != null;
         public DateTimeOffset? LeftOn { get; set; }
         public DateTimeOffset JoinedOn { get; set; }
 
-        public IReadOnlyList<Character> Alts
+        public IEnumerable<Character> Alts
         {
             get { return _alts; }
-        }
-
-        public void AddAlt(string name)
-        {
-            AddAlt(new Character(name));
-        }
-        
-        public void AddAlt(Character alt)
-        {
-            _alts.Add(alt);
+            set { _alts = value.ToList(); }
         }
 
         public bool Owns(string charName)

@@ -27,7 +27,7 @@ namespace FrozenGold.Console
             var ahead = new List<PlayerReport>();
             var behind = new List<PlayerReport>();
             var correct = new List<PlayerReport>();
-            foreach (var playerReport in report.PlayerReports.Where(pr => !pr.Player.IsRetired))
+            foreach (var playerReport in report.PlayerReports.Where(pr => !pr.Player.IsRetired()))
             {
                 var summary = playerReport.ReportSummary;
                 switch (summary.Status)

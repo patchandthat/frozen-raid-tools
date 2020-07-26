@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FrozenGold
 {
@@ -6,8 +7,12 @@ namespace FrozenGold
     {
         private List<Player> _players = new List<Player>();
 
-        public IEnumerable<Player> Players => _players;
-
+        public IEnumerable<Player> Players
+        {
+            get { return _players; }
+            set { _players = value.ToList(); }
+        }
+        
         public virtual Roster Add(Player player)
         {
             if (_players.Contains(player)) 

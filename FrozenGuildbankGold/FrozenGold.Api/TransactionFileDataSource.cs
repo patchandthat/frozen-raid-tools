@@ -21,12 +21,12 @@ namespace FrozenGold.Api
 
         public Roster GetRoster()
         {
-            return null;
+            return new FrozenRoster();
         }
 
         public Tariff GetTariff()
         {
-            return null;
+            return new FrozenTariff();
         }
 
         public IReadOnlyList<Transaction> GetTransactionHistory()

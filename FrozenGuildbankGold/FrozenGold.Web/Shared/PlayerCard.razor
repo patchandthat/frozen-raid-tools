@@ -2,7 +2,7 @@
 <div class="card">
     <div class="card-header">
         <strong>@PlayerReport.Player.Main.Name</strong>
-        @if (PlayerReport.Player.IsRetired)
+        @if (PlayerReport.Player.IsRetired())
         {
             <span class="text-muted"> (quit quit)</span>
         }
@@ -11,7 +11,7 @@
         <p class="card-text">Total received: @PlayerReport.AmountPaid</p>
         <p class="card-text">Total expected: @PlayerReport.AmountDueToDate</p>
         <p class="card-text">First payment from: @PlayerReport.PaymentsStartFrom.ToString("dd MMM yyyy")</p>
-        @if (PlayerReport.Player.IsRetired)
+        @if (PlayerReport.Player.IsRetired())
         {
             <p class="card-text">Left on: @PlayerReport.Player.LeftOn.Value.ToString("dd MMM yyyy")</p>
         }

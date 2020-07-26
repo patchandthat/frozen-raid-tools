@@ -101,7 +101,7 @@ namespace FrozenGold
                     
                     var intervalEndDate = currentDate + currentRate.RepeatInterval;
                     
-                    if (player.IsRetired && player.LeftOn < intervalEndDate)
+                    if (player.IsRetired() && player.LeftOn < intervalEndDate)
                         break;
                     
                     if (player.JoinedOn < intervalEndDate)
@@ -146,7 +146,7 @@ namespace FrozenGold
                     }
 
                     // Account for refunds where the player left the raid team
-                    if (player.IsRetired)
+                    if (player.IsRetired())
                     {
                         var report = playerReports[player];
                         report.AmountPaid -= tx.Amount;

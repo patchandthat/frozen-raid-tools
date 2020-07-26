@@ -45,7 +45,7 @@ namespace FrozenGold.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to provode transactions");
+                _logger.LogError(e, "Failed to provide transactions");
                 throw;
             }
         }
