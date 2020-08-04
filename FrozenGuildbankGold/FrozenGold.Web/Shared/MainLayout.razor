@@ -27,7 +27,8 @@
     protected override async Task OnInitializedAsync()
     {
         var transactions = await Http.GetFromJsonAsync<FrozenGold.Web.Services.TransactionHistory>("api/transactions");
-        var ds = new FrozenGold.Web.Services.DataSource(transactions);
+        var players = await Http.GetFromJsonAsync<FrozenGold.Web.Services.PlayersDto>("api/roster");
+        var ds = new FrozenGold.Web.Services.DataSource(transactions, players);
         var report = new GoldReport(ds);
         report.BuildReport();
 

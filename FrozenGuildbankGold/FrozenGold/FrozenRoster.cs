@@ -94,6 +94,26 @@ namespace FrozenGold
                 .Add(new Player("Gicanu")
                 {
                     LeftOn = new DateTimeOffset(2020, 06, 25, 22, 0, 0, TimeSpan.Zero)
+                })
+                .Add(new Player("Awesomekek")
+                {
+                    JoinedOn = new DateTimeOffset(2020, 08, 05, 06, 0, 0, TimeSpan.Zero)
+                })
+                .Add(new Player("Boibard")
+                {
+                    JoinedOn = new DateTimeOffset(2020, 08, 05, 06, 0, 0, TimeSpan.Zero)
+                })
+                .Add(new Player("Aswe")
+                {
+                    JoinedOn = new DateTimeOffset(2020, 08, 05, 06, 0, 0, TimeSpan.Zero)
+                })
+                .Add(new Player("Spinogriz")
+                {
+                    JoinedOn = new DateTimeOffset(2020, 08, 05, 06, 0, 0, TimeSpan.Zero)
+                })
+                .Add(new Player("Maniya")
+                {
+                    JoinedOn = new DateTimeOffset(2020, 08, 05, 06, 0, 0, TimeSpan.Zero)
                 });
         }
     }

@@ -7,12 +7,14 @@ namespace FrozenGold.Web.Services
     public class DataSource : IDataSource
     {
         private TransactionHistory _txns;
+        private readonly Roster _roster;
 
         public DateTimeOffset NowServerTime => DateTimeOffset.UtcNow;
 
-        public DataSource(TransactionHistory txns)
+        public DataSource(TransactionHistory txns, PlayersDto players)
         {
             _txns = txns;
+            _roster = new RosterBuilder(players).Build();
         }
 
         public DateTimeOffset GetLastUpdatedDate()
@@ -22,7 +24,7 @@ namespace FrozenGold.Web.Services
 
         public Roster GetRoster()
         {
-            return new FrozenRoster();
+            return _roster;
         }
 
         public Tariff GetTariff()
