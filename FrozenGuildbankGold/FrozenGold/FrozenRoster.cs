@@ -39,7 +39,7 @@ namespace FrozenGold
                 .Add(new Player("Marodören"))
                 .Add(new Player("Rikxx"))
                 .Add(new Player("Whi", "Whilerr"))
-                .Add(new Player("Deceptions"))
+                .Add(new Player("Deceptions", "Nocturnity"))
                 .Add(new Player("Raige", "Bankaige"))
                 .Add(new Player("Poutana", "Poutanara")
                 {
